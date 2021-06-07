@@ -45,10 +45,10 @@ class Calculator:
         каллорий/потраченых денег за последние 7 дней.
         """
         today = dt.date.today()
-        week_later = today - dt.timedelta(days=6)
+        week_later = today - dt.timedelta(days=7)
         return sum(
             record.amount for record in self.records
-            if week_later <= record.date <= today)
+            if week_later < record.date <= today)
 
     def get_remaining_limit(self):
         """Метод get_remaining_limit считает оставшиеся
@@ -86,20 +86,17 @@ class CashCalculator(Calculator):
         """Метод get_today_cash_remained денежного калькулятора
         принимает на вход код валюты и возвращает дневной баланс.
         """
-        try:
-            currencies = {
-                'rub': ('руб', self.RUB_RATE),
-                'usd': ('USD', self.USD_RATE),
-                'eur': ('Euro', self.EURO_RATE)
-            }
-            cash_remained = self.get_remaining_limit()
-            if cash_remained == 0:
-                return 'Денег нет, держись'
-            cur_name, rate = currencies.get(currency)
-            cash_remained = round(cash_remained / rate, 2)
-            if cash_remained > 0:
-                return f'На сегодня осталось {cash_remained} {cur_name}'
-            cash_remained = abs(cash_remained)
-            return f'Денег нет, держись: твой долг-{cash_remained} {cur_name}'
-        except TypeError:
-            print('Указанный код валюты не поддерживается.')
+        currencies = {
+            'rub': ('руб', self.RUB_RATE),
+            'usd': ('USD', self.USD_RATE),
+            'eur': ('Euro', self.EURO_RATE)
+        }
+        cash_remained = self.get_remaining_limit()
+        if cash_remained == 0:
+            return 'Денег нет, держись'
+        cur_name, rate = currencies.get(currency)
+        cash_remained = round(cash_remained / rate, 2)
+        if cash_remained > 0:
+            return f'На сегодня осталось {cash_remained} {cur_name}'
+        cash_remained = abs(cash_remained)
+        return f'Денег нет, держись: твой долг - {cash_remained} {cur_name}'
